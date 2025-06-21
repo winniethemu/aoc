@@ -1,7 +1,7 @@
 package main
 
 import (
-	utils "2024"
+	"2024/utils"
 	"fmt"
 	"strconv"
 	"strings"
