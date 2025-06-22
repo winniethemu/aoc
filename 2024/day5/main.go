@@ -3,6 +3,7 @@ package main
 import (
 	"2024/utils"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -16,6 +17,19 @@ func validate(pages []string, rules map[string]utils.Set[string]) bool {
 		}
 	}
 	return true
+}
+
+func reorder(pages []string, rules map[string]utils.Set[string]) []string {
+	slices.SortFunc(pages, func(a, b string) int {
+		if rules[a].Contains(b) {
+			return -1
+		}
+		if rules[b].Contains(a) {
+			return 1
+		}
+		return 0
+	})
+	return pages
 }
 
 func main() {
@@ -38,15 +52,20 @@ func main() {
 		}
 	}
 
-	total := 0
+	total1 := 0
+	total2 := 0
 	for ; idx < len(lines); idx++ {
 		line := lines[idx]
 		pages := strings.Split(line, ",")
 		if validate(pages, rules) {
 			midpage, _ := strconv.Atoi(pages[len(pages)/2])
-			total += midpage
+			total1 += midpage
+		} else {
+			pages = reorder(pages, rules)
+			midpage, _ := strconv.Atoi(pages[len(pages)/2])
+			total2 += midpage
 		}
 	}
 
-	fmt.Println(total)
+	fmt.Println(total1, total2)
 }
