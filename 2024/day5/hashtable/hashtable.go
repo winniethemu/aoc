@@ -1,4 +1,4 @@
-package day5
+package hashtable
 
 import (
 	"2024/utils"
@@ -32,7 +32,7 @@ func reorder(pages []string, rules map[string]utils.Set[string]) []string {
 	return pages
 }
 
-func RunHashtable() {
+func Run() {
 	rules := make(map[string]utils.Set[string])
 
 	idx := 0

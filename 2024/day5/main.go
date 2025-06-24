@@ -1,7 +1,8 @@
 package main
 
 import (
-	day5 "2024/day5/internal"
+	"2024/day5/hashtable"
+	"2024/day5/toposort"
 	"log"
 	"os"
 )
@@ -13,9 +14,9 @@ func main() {
 	}
 	switch args[0] {
 	case "hashtable":
-		day5.RunHashtable()
+		hashtable.Run()
 	case "toposort":
-		day5.RunToposort()
+		toposort.Run()
 	default:
 		log.Fatal("invalid argument name")
 	}
