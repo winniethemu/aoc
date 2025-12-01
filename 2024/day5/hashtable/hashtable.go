@@ -1,11 +1,12 @@
 package hashtable
 
 import (
-	"2024/utils"
 	"fmt"
 	"slices"
 	"strconv"
 	"strings"
+
+	"aoc/utils"
 )
 
 func validate(pages []string, rules map[string]utils.Set[string]) bool {

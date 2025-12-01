@@ -1,10 +1,11 @@
 package main
 
 import (
-	"2024/day5/hashtable"
-	"2024/day5/toposort"
 	"log"
 	"os"
+
+	"aoc/2024/day5/hashtable"
+	"aoc/2024/day5/toposort"
 )
 
 func main() {

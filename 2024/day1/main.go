@@ -1,11 +1,12 @@
 package main
 
 import (
-	"2024/utils"
 	"fmt"
 	"sort"
 	"strconv"
 	"strings"
+
+	"aoc/utils"
 )
 
 func part1(lines []string) int {

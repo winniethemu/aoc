@@ -1,10 +1,11 @@
 package toposort
 
 import (
-	"2024/utils"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"aoc/utils"
 )
 
 // check if `pages` is a subsequence of `rule`

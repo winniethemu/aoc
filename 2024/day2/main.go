@@ -1,10 +1,11 @@
 package main
 
 import (
-	"2024/utils"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"aoc/utils"
 )
 
 func validate(levels []int) bool {

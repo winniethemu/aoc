@@ -1,11 +1,12 @@
 package main
 
 import (
-	"2024/utils"
 	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"aoc/utils"
 )
 
 func sum(line string) int {
