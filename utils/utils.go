@@ -13,10 +13,10 @@ func AbsInt(x int) int {
 }
 
 func ReadLines(filename string) []string {
-	return readInput(filename, "\n")
+	return ReadInput(filename, "\n")
 }
 
-func readInput(filename, delimiter string) []string {
+func ReadInput(filename, delimiter string) []string {
 	dat, err := os.ReadFile(filename)
 	if err != nil {
 		panic("error reading the file")
