@@ -59,6 +59,11 @@ func part2(mat [][]string) int {
 	for len(queue) > 0 {
 		row, col := queue[0][0], queue[0][1]
 		queue = queue[1:]
+
+		if mat[row][col] != "@" {
+			continue
+		}
+
 		mat[row][col] = "."
 
 		for _, neighbor := range neighbors {
