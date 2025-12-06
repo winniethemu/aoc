@@ -60,6 +60,45 @@ func part1(dataInput []string, opsInput string) int {
 	return res
 }
 
+func resetSubtotal(op string) int {
+	if op == "*" {
+		return 1
+	}
+	return 0
+}
+
+func part2(data []string, opsline string) int {
+	res := 0
+	ops := parse(opsline)
+
+	columns := len(data[0])
+	problem := 0
+	subtotal := resetSubtotal(ops[problem])
+
+	for j := range columns {
+		item := ""
+		for i := range data {
+			item += string(data[i][j])
+		}
+
+		if strings.TrimSpace(item) == "" {
+			res += subtotal
+			problem++
+			subtotal = resetSubtotal(ops[problem])
+		} else {
+			num, _ := strconv.Atoi(strings.TrimSpace(item))
+			if ops[problem] == "+" {
+				subtotal += num
+			} else {
+				subtotal *= num
+			}
+		}
+	}
+
+	res += subtotal
+	return res
+}
+
 func main() {
 	lines := utils.ReadLines("input.txt")
 
@@ -68,4 +107,7 @@ func main() {
 
 	res1 := part1(data, ops)
 	fmt.Printf("Part 1: %d\n", res1)
+
+	res2 := part2(data, ops)
+	fmt.Printf("Part 2: %d\n", res2)
 }
