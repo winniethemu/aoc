@@ -74,7 +74,7 @@ func (dsu *DSU) Union(x, y int) {
 	rx := dsu.Find(x)
 	ry := dsu.Find(y)
 	if rx == ry {
-		return // already in same component
+		return
 	}
 	// Union by size: attach smaller tree to larger tree
 	if dsu.sizes[rx] < dsu.sizes[ry] {
@@ -146,6 +146,37 @@ func part1(positions []Position, nConn int) int {
 	return res
 }
 
+func part2(positions []Position) int {
+	pq := make(PriorityQueue, 0)
+	for i := range len(positions) {
+		for j := i + 1; j < len(positions); j++ {
+			pair := JunctionBoxPair{
+				Priority: dist2(positions[i], positions[j]),
+				Pos1:     positions[i],
+				Pos2:     positions[j],
+			}
+			heap.Push(&pq, &pair)
+		}
+	}
+
+	pairs := make([]JunctionBoxPair, pq.Len())
+	for i := pq.Len() - 1; i >= 0; i-- {
+		pairs[i] = heap.Pop(&pq).(JunctionBoxPair)
+	}
+
+	// Union-Find
+	dsu := NewDSU(len(positions))
+	for _, pair := range pairs {
+		pos1, pos2 := pair.Pos1, pair.Pos2
+		dsu.Union(pos1.ID, pos2.ID)
+		if slices.Index(dsu.sizes, len(positions)) > -1 {
+			return pos1.X * pos2.X
+		}
+	}
+
+	panic("should not get here")
+}
+
 // Distance squared
 func dist2(pos1, pos2 Position) int {
 	dx := pos1.X - pos2.X
@@ -171,4 +202,7 @@ func main() {
 
 	res1 := part1(parse(lines), 1000)
 	fmt.Printf("Part 1: %d\n", res1)
+
+	res2 := part2(parse(lines))
+	fmt.Printf("Part 2: %d\n", res2)
 }
