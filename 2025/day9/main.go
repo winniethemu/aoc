@@ -7,57 +7,69 @@ import (
 	"strings"
 )
 
-var reds [][2]int
-
-func leftDiagonal(pos1, pos2 [2]int) bool {
-	return pos1[0] < pos2[0] && pos1[1] > pos2[1]
+type Point [2]int
+type Vec2 struct {
+	start Point
+	end   Point
 }
 
-func diagonals(pos1, pos2 [2]int) bool {
-	for _, red := range reds {
-		if leftDiagonal(pos1, pos2) {
-			if (red[0] <= pos1[0] && red[1] <= pos2[1]) ||
-				(red[0] >= pos2[0] && red[1] >= pos1[1]) {
-				return true
-			}
-		} else {
-			if (red[0] <= pos1[0] && red[1] >= pos2[1]) ||
-				(red[0] >= pos2[0] && red[1] <= pos1[1]) {
-				return true
-			}
-		}
-	}
+var reds []Point
+
+func intersecting(v1, v2 Vec2) bool {
 	return false
 }
 
-func inbetween(pos1, pos2 [2]int) bool {
-	for _, red := range reds {
-		if pos1[0] < red[0] && red[0] < pos2[0] &&
-			pos1[1] < red[1] && red[1] < pos2[1] {
-			return true
+func getBoundingBox(polygon []Point) (Point, Point) {
+	minX, minY := polygon[0][0], polygon[0][1]
+	maxX, maxY := polygon[0][0], polygon[0][1]
+	for _, point := range polygon {
+		minX = min(minX, point[0])
+		minY = min(minY, point[1])
+		maxX = max(maxX, point[0])
+		maxY = max(maxY, point[1])
+	}
+	return Point{minX, minY}, Point{maxX, maxY}
+}
+
+// ray casting
+func inside(point Point, polygon []Point) bool {
+	// points outside of bounding box are def not in the polygon
+	topleft, bottomright := getBoundingBox(polygon)
+	if point[0] < topleft[0] || point[0] > bottomright[0] || point[1] < topleft[1] || point[1] > bottomright[1] {
+		return false
+	}
+
+	sides := make([]Vec2, 0, len(polygon))
+	for i := 1; i < len(polygon); i++ {
+		sides = append(sides, Vec2{start: polygon[i-1], end: polygon[i]})
+	}
+
+	ray := Vec2{start: point, end: Point{0, 0}} // assuming (0, 0) is outside of polygon
+	intersections := 0
+	for _, side := range sides {
+		if intersecting(ray, side) {
+			intersections++
 		}
 	}
-	return false
-
+	return intersections%2 == 1
 }
 
-func valid(pos1, pos2 [2]int) bool {
-	if inbetween(pos1, pos2) {
-		return false
-	}
+// check if the rectangle specified by the given two points are fully contained
+// by the polygon
+func valid(pos1, pos2 Point) bool {
+	// pos1, pos2 are red tiles and therefore must be inside the polygon
+	// check the other two vertices
+	p1 := Point{pos1[0], pos2[1]}
+	p2 := Point{pos2[0], pos1[1]}
 
-	if !diagonals(pos1, pos2) {
-		return false
-	}
-
-	return true
+	return inside(p1, reds) && inside(p2, reds)
 }
 
-func area(pos1, pos2 [2]int) int {
+func area(pos1, pos2 Point) int {
 	return (utils.AbsInt(pos1[0]-pos2[0]) + 1) * (utils.AbsInt(pos1[1]-pos2[1]) + 1)
 }
 
-func solve(validator func(p1, p2 [2]int) bool) int {
+func solve(validator func(p1, p2 Point) bool) int {
 	res := 0
 	n := len(reds)
 	for i := range n {
@@ -77,13 +89,13 @@ func solve(validator func(p1, p2 [2]int) bool) int {
 	return res
 }
 
-func parse(lines []string) [][2]int {
-	res := make([][2]int, len(lines))
+func parse(lines []string) []Point {
+	res := make([]Point, len(lines))
 	for i, line := range lines {
 		xy := strings.Split(line, ",")
 		x, _ := strconv.Atoi(xy[0])
 		y, _ := strconv.Atoi(xy[1])
-		res[i] = [2]int{x, y}
+		res[i] = Point{x, y}
 	}
 	return res
 }
