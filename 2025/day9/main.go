@@ -22,12 +22,18 @@ type Vec2 struct {
 var reds []Point
 
 func intersecting(v1, v2 Vec2) bool {
+	// ignore intersecting on the endpoint
+	if v1.start.Equal(v2.start) || v1.start.Equal(v2.end) ||
+		v1.end.Equal(v2.start) || v1.end.Equal(v2.end) {
+		return false
+	}
+
 	a1 := v1.end[1] - v1.start[1]
 	b1 := v1.start[0] - v1.end[0]
 	c1 := (v1.end[0] * v1.start[1]) - (v1.start[0] * v1.end[1])
 	d1 := (a1 * v2.start[0]) + (b1 * v2.start[1]) + c1
 	d2 := (a1 * v2.end[0]) + (b1 * v2.end[1]) + c1
-	if d1*d2 > 0 {
+	if d1*d2 >= 0 {
 		return false
 	}
 
@@ -36,7 +42,7 @@ func intersecting(v1, v2 Vec2) bool {
 	c2 := (v2.end[0] * v2.start[1]) - (v2.start[0] * v2.end[1])
 	d1 = (a2 * v1.start[0]) + (b2 * v1.start[1]) + c2
 	d2 = (a2 * v1.end[0]) + (b2 * v1.end[1]) + c2
-	return d1*d2 <= 0
+	return d1*d2 < 0
 }
 
 func getBoundingBox(polygon []Point) (Point, Point) {
@@ -100,7 +106,6 @@ func valid(pos1, pos2 Point) bool {
 	}
 
 	// check none of the rect's edges intersect any of the polygon's edges
-	// (TODO) should ignore intersecting on the endpoint
 	rectEdges := getSides([]Point{pos1, pos2, p1, p2})
 	polyEdges := getSides(reds)
 	for _, e1 := range rectEdges {
