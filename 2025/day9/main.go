@@ -51,6 +51,15 @@ func getBoundingBox(polygon []Point) (Point, Point) {
 	return Point{minX, minY}, Point{maxX, maxY}
 }
 
+func getSides(polygon []Point) []Vec2 {
+	sides := make([]Vec2, 0, len(polygon))
+	for i := 1; i < len(polygon); i++ {
+		sides = append(sides, Vec2{start: polygon[i-1], end: polygon[i]})
+	}
+	sides = append(sides, Vec2{start: polygon[len(polygon)-1], end: polygon[0]})
+	return sides
+}
+
 // ray casting
 func inside(point Point, polygon []Point) bool {
 	// points outside of bounding box are def not in the polygon
@@ -65,11 +74,7 @@ func inside(point Point, polygon []Point) bool {
 		return true
 	}
 
-	sides := make([]Vec2, 0, len(polygon))
-	for i := 1; i < len(polygon); i++ {
-		sides = append(sides, Vec2{start: polygon[i-1], end: polygon[i]})
-	}
-	sides = append(sides, Vec2{start: polygon[len(polygon)-1], end: polygon[0]})
+	sides := getSides(polygon)
 
 	ray := Vec2{start: point, end: Point{0, 0}} // assuming (0, 0) is outside of polygon
 	intersections := 0
@@ -89,7 +94,24 @@ func valid(pos1, pos2 Point) bool {
 	p1 := Point{pos1[0], pos2[1]}
 	p2 := Point{pos2[0], pos1[1]}
 
-	return inside(p1, reds) && inside(p2, reds)
+	// check all corners are inside polygon
+	if !inside(p1, reds) || !inside(p2, reds) {
+		return false
+	}
+
+	// check none of the rect's edges intersect any of the polygon's edges
+	// (TODO) should ignore intersecting on the endpoint
+	rectEdges := getSides([]Point{pos1, pos2, p1, p2})
+	polyEdges := getSides(reds)
+	for _, e1 := range rectEdges {
+		for _, e2 := range polyEdges {
+			if intersecting(e1, e2) {
+				return false
+			}
+		}
+	}
+
+	return true
 }
 
 func area(pos1, pos2 Point) int {
