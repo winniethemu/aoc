@@ -3,11 +3,17 @@ package main
 import (
 	"aoc/utils"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
 
 type Point [2]int
+
+func (p Point) Equal(q Point) bool {
+	return p[0] == q[0] && p[1] == q[1]
+}
+
 type Vec2 struct {
 	start Point
 	end   Point
@@ -16,7 +22,21 @@ type Vec2 struct {
 var reds []Point
 
 func intersecting(v1, v2 Vec2) bool {
-	return false
+	a1 := v1.end[1] - v1.start[1]
+	b1 := v1.start[0] - v1.end[0]
+	c1 := (v1.end[0] * v1.start[1]) - (v1.start[0] * v1.end[1])
+	d1 := (a1 * v2.start[0]) + (b1 * v2.start[1]) + c1
+	d2 := (a1 * v2.end[0]) + (b1 * v2.end[1]) + c1
+	if d1*d2 > 0 {
+		return false
+	}
+
+	a2 := v2.end[1] - v2.start[1]
+	b2 := v2.start[0] - v2.end[0]
+	c2 := (v2.end[0] * v2.start[1]) - (v2.start[0] * v2.end[1])
+	d1 = (a2 * v1.start[0]) + (b2 * v1.start[1]) + c2
+	d2 = (a2 * v1.end[0]) + (b2 * v1.end[1]) + c2
+	return d1*d2 <= 0
 }
 
 func getBoundingBox(polygon []Point) (Point, Point) {
@@ -39,10 +59,17 @@ func inside(point Point, polygon []Point) bool {
 		return false
 	}
 
+	if slices.ContainsFunc(polygon, func(pt Point) bool {
+		return point.Equal(pt)
+	}) {
+		return true
+	}
+
 	sides := make([]Vec2, 0, len(polygon))
 	for i := 1; i < len(polygon); i++ {
 		sides = append(sides, Vec2{start: polygon[i-1], end: polygon[i]})
 	}
+	sides = append(sides, Vec2{start: polygon[len(polygon)-1], end: polygon[0]})
 
 	ray := Vec2{start: point, end: Point{0, 0}} // assuming (0, 0) is outside of polygon
 	intersections := 0
@@ -101,7 +128,7 @@ func parse(lines []string) []Point {
 }
 
 func main() {
-	lines := utils.ReadLines("example.txt")
+	lines := utils.ReadLines("input.txt")
 	reds = parse(lines)
 
 	res1 := solve(nil)
